@@ -69,6 +69,7 @@ D_in, H, D_out = 784, 500, 20
 vae = VAE(D_in, H, D_out)
 vae.to("cpu")
 
+
 def train():
     vae.train()
     optimizer = optim.Adam(vae.parameters(), lr=1e-3)
@@ -99,3 +100,21 @@ def train():
                     )
                 )
     torch.save(vae.state_dict(), "vae.%d" % epoch)
+
+
+def test():
+    dist = MultivariateNormal(torch.zeros(D_out), torch.eye(D_out))
+    vae = VAE(D_in, H, D_out)
+    vae.load_state_dict(torch.load("vae.%d" % 9))
+    vae.eval()
+    outputs = []
+
+    for i in range(100):
+        sample = dist.sample()
+        outputs.append(vae.reconstruct(sample).view((1,1,28,28)))
+    outputs = torch.stack(outputs).view(100,1,28,28)
+    save_image(outputs, "prior_reconstruct_100.png", nrow=10)
+
+
+train()
+test()
