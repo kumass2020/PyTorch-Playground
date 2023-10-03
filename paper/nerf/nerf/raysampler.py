@@ -91,7 +91,8 @@ class ProbabilisticRaysampler(torch.nn.Module):
             # Add the new samples to the input ones.
             z_vals = torch.cat((z_vals, z_samples), dim=-1)
         else:
-            z_vals = z_samples
+            z_vals =+\
+                z_samples
         # Resort by depth.
         z_vals, _ = torch.sort(z_vals, dim=-1)
 

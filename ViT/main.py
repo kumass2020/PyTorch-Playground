@@ -1,19 +1,19 @@
-from transformers import AutoImageProcessor, ViTForImageClassification
 import torch
-from datasets import load_dataset
+from vit_pytorch import ViT
 
-image_processor = AutoImageProcessor.from_pretrained("google/vit-base-patch16-224")
-model = ViTForImageClassification.from_pretrained("google/vit-base-patch16-224")
+v = ViT(
+    image_size = 256,
+    patch_size = 32,
+    num_classes = 1000,
+    dim = 1024,
+    depth = 6,
+    heads = 16,
+    mlp_dim = 2048,
+    dropout = 0.1,
+    emb_dropout = 0.1
+)
 
-for i in range(100):
-    dataset = load_dataset("huggingface/cats-image")
-    image = dataset["test"]["image"][i]
+img = torch.randn(1, 3, 256, 256)
 
-    inputs = image_processor(image, return_tensors="pt")
-
-    with torch.no_grad():
-        logits = model(**inputs).logits
-
-    # model predicts one of the 1000 ImageNet classes
-    predicted_label = logits.argmax(-1).item()
-    print(model.config.id2label[predicted_label])
+preds = v(img) # (1, 1000)
+print(preds)
